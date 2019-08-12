@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using HyperVRemote.Source.Interface;
@@ -48,35 +50,60 @@ namespace HyperVRemote.Source.Implementation
 
         public void RestoreLastSnapShot()
         {
-            var raw = _rawMachine;
-            var scope = _rawMachine.Scope;
-
-            var lastSnapshot = raw.GetRelated(
-                "Msvm_VirtualSystemSettingData",
-                "Msvm_MostCurrentSnapshotInBranch",
-                null,
-                null,
-                "Dependent",
-                "Antecedent",
-                false,
-                null).OfType<ManagementObject>().FirstOrDefault();
+            var lastSnapshot = GetSnapshotsQuery("Msvm_MostCurrentSnapshotInBranch")
+                .FirstOrDefault();
 
             if (lastSnapshot == null)
             {
                 throw new HyperVException("No Snapshot found");
             }
-
           
+            ApplySnapshot(lastSnapshot);
+        }
+
+        public void RestoreSnapShotByName(string name)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+
+            var snapshot = GetSnapshotsQuery("Msvm_SnapshotOfVirtualSystem")
+                .FirstOrDefault(item => name == item["ElementName"] as string);
+
+            if (snapshot == null)
+            {
+                throw new HyperVException("No Snapshot found");
+            }
+
+            ApplySnapshot(snapshot);
+        }
+
+        private void ApplySnapshot(ManagementObject lastSnapshot)
+        {
+            var scope = _rawMachine.Scope;
+
             var managementService = new ManagementClass(scope, new ManagementPath("Msvm_VirtualSystemSnapshotService"), null)
                 .GetInstances()
-                .OfType<ManagementObject>().FirstOrDefault();
+                .OfType<ManagementObject>()
+                .First();
 
             var inParameters = managementService.GetMethodParameters("ApplySnapshot");
 
             inParameters["Snapshot"] = lastSnapshot.Path.Path;
 
-            var outParameters = managementService.InvokeMethod("ApplySnapshot", inParameters, null);
+            managementService.InvokeMethod("ApplySnapshot", inParameters, null);
+        }
 
+        private IEnumerable<ManagementObject> GetSnapshotsQuery(string relation)
+        {
+            return _rawMachine.GetRelated(
+                    "Msvm_VirtualSystemSettingData",
+                    relation,
+                    null,
+                    null,
+                    "Dependent",
+                    "Antecedent",
+                    false,
+                    null)
+                .OfType<ManagementObject>();
         }
 
         private uint ChangeState(HyperVStatus state)

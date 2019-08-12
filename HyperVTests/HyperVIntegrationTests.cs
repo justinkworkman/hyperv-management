@@ -114,6 +114,28 @@ namespace HyperVTests
             machine.Start();
         }
 
+
+        [TestCase(TestMachineName, "Base")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.ExpectedException(typeof(Exception))]
+        public void TestMachineRestore(string machineName, string snapshotName)
+        {
+            var provider = _container.GetRequiredService<IHyperVProvider>();
+
+            provider.Connect();
+
+            IHyperVMachine machine = provider.GetMachineByName(machineName);
+
+            machine.Stop();
+
+            Thread.Sleep(2000);
+
+            machine.RestoreSnapShotByName(snapshotName);
+
+            Thread.Sleep(2000);
+
+            machine.Start();
+        }
+
         [TestCase(TestMachineName)]
         public void TestMachineStart(string machineName)
         {
@@ -183,7 +205,7 @@ namespace HyperVTests
             var provider = _container.GetRequiredService<IHyperVProvider>();
 
             Thread.Sleep(5000);
-           // provider.Connect();
+            provider.Connect();
 
             IHyperVMachine machine = provider.GetMachineByName(TestMachineName);
 
