@@ -86,8 +86,15 @@ namespace HyperVRemote.Source.Implementation
                .OfType<ManagementObject>().Where(x => "Virtual Machine" == (string)x["Caption"]);
 
             return new HyperVMachine(en.First(x => x["ElementName"] as string == name));
-        }    
+        }
 
-       
+        public IHyperVMemory GetVmMemory(System.Guid deviceId)
+        {
+            var en = new ManagementClass(_scope, new ManagementPath("Msvm_Memory"), null)
+                .GetInstances()
+                .OfType<ManagementObject>().Where(x => deviceId == (System.Guid)x["SystemName"]);
+
+            return new HyperVMemory(en.First());
+        }
     }
 }
