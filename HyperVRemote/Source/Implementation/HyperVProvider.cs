@@ -86,8 +86,33 @@ namespace HyperVRemote.Source.Implementation
                .OfType<ManagementObject>().Where(x => "Virtual Machine" == (string)x["Caption"]);
 
             return new HyperVMachine(en.First(x => x["ElementName"] as string == name));
-        }    
+        }
 
-       
+        public IHyperVMemory GetVmMemory(System.Guid deviceId)
+        {
+            var en = new ManagementClass(_scope, new ManagementPath("Msvm_Memory"), null)
+                .GetInstances()
+                .OfType<ManagementObject>().Where(x => deviceId == new System.Guid(x["Name"].ToString().Replace("Microsoft:", "").Substring(0, 36)));
+
+            if (en.Any())
+            {
+                return new HyperVMemory(en.First());
+            }
+            return null;
+            
+        }
+        public IEnumerable<IHyperVProcessor> GetVmCpu(System.Guid deviceId)
+        {
+            var en = new ManagementClass(_scope, new ManagementPath("Msvm_Processor"), null)
+                .GetInstances()
+                .OfType<ManagementObject>().Where(x => deviceId == new System.Guid(x["Name"].ToString().Replace("Microsoft:", "").Substring(0, 36)));
+
+            if (en.Any())
+            {
+                List<HyperVProcessor> cpus = en.Select(cpu => new HyperVProcessor(cpu)).ToList();
+                return cpus;
+            }
+            return null;
+        }
     }
 }

@@ -31,6 +31,10 @@ namespace HyperVRemote.Source.Implementation
         {           
             return (HyperVStatus)_rawMachine["EnabledState"];
         }
+        public long GetUptime()
+        {
+            return long.Parse(_rawMachine["OnTimeInMilliseconds"].ToString());
+        }
 
 
         public void Reset()
