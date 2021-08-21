@@ -96,5 +96,13 @@ namespace HyperVRemote.Source.Implementation
 
             return new HyperVMemory(en.First());
         }
+        public IHyperVProcessor GetVmCpu(System.Guid deviceId)
+        {
+            var en = new ManagementClass(_scope, new ManagementPath("Msvm_Processor"), null)
+                .GetInstances()
+                .OfType<ManagementObject>().Where(x => deviceId == (System.Guid)x["SystemName"]);
+
+            return new HyperVProcessor(en.First());
+        }
     }
 }
