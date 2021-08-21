@@ -8,13 +8,13 @@
     <TargetFramework>net461</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>hyperv-manager</PackageId>
-    <Authors>sergemso</Authors>
-    <Company>sergemso</Company>
+    <Authors>justinkworkman</Authors>
+    <Company>justinkworkman</Company>
     <Product>hyperv-manager</Product>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageTags>hyper-v, hyperv, virtualmachine, vm, connection</PackageTags>
-    <PackageProjectUrl>https://github.com/sergemso/hyperv-management</PackageProjectUrl>
-    <Version>1.0.1</Version>
+    <PackageProjectUrl>https://github.com/justinkworkman/hyperv-management</PackageProjectUrl>
+    <Version>1.0.2.1</Version>
   </PropertyGroup>
   
   <ItemGroup>

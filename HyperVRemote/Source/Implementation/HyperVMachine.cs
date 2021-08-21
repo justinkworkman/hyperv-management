@@ -33,7 +33,7 @@ namespace HyperVRemote.Source.Implementation
         }
         public long GetUptime()
         {
-            return long.Parse(_rawMachine["OnTimeInMilleseconds"].ToString());
+            return long.Parse(_rawMachine["OnTimeInMilliseconds"].ToString());
         }
 
 
